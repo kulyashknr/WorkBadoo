@@ -1,9 +1,11 @@
 from django.db import models
-from django.contrib.auth.models import User, AbstractUser, AbstractBaseUser, PermissionsMixin, BaseUserManager
-from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import AbstractUser
+
+from api.constants import USER_TYPES
 
 
 class MainUser(AbstractUser):
+    status = models.SmallIntegerField(choices=USER_TYPES)
     #photo = models.FileField(upload_to=user_photo_path, validators=[validate_size, validate_extension], blank=True, null=True)
 
     class Meta:
@@ -15,7 +17,7 @@ class MainUser(AbstractUser):
 
 
 class Worker(models.Model):
-    user = models.OneToOneField(MainUser, on_delete=models.CASCADE, related_name='worker_user')
+    user = models.ForeignKey(MainUser, on_delete=models.CASCADE, related_name='worker_user')
     bio = models.TextField(max_length=500)
     education = models.CharField(max_length=255)
     experience = models.CharField(max_length=255)
