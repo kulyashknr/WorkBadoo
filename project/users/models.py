@@ -5,7 +5,7 @@ from api.constants import USER_TYPES
 
 
 class MainUser(AbstractUser):
-    status = models.SmallIntegerField(choices=USER_TYPES)
+    #status = models.SmallIntegerField(choices=USER_TYPES)
     #photo = models.FileField(upload_to=user_photo_path, validators=[validate_size, validate_extension], blank=True, null=True)
 
     class Meta:

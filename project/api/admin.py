@@ -4,7 +4,7 @@ from django.contrib.auth.admin import UserAdmin
 
 @admin.register(MainUser)
 class MainUserAdmin(UserAdmin):
-    list_display = ('id', 'username', 'role', )
+    list_display = ('id', 'username', )
 
 
 admin.site.register(Worker)
