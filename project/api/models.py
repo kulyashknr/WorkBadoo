@@ -1,6 +1,6 @@
 from django.db import models
 from users.models import MainUser, Worker, Company
-from .constants import INDUSTRY_TYPES
+from .constants import INDUSTRY_TYPES, MATCHING_STATUSES
 
 
 class Vacancy(models.Model):
@@ -29,6 +29,7 @@ class MatchingForCompany(models.Model):
 class Matching(models.Model):
     vacancy = models.ForeignKey(Vacancy, on_delete=models.DO_NOTHING, null=True, related_name='vacancy')
     worker = models.ForeignKey(MainUser, on_delete=models.DO_NOTHING, null=True, related_name='worker')
+    status = models.PositiveSmallIntegerField(choices=MATCHING_STATUSES)
 
 
 

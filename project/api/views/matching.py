@@ -1,10 +1,12 @@
 from rest_framework import mixins, viewsets
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from api.models import MatchingForCompany, MatchingForWorker
+from api.constants import MATCHED_BY_BOTH, MATCHED_BY_USER, MATCHED_BY_COMPANY, DECLINED_BY_COMPANY, DECLINED_BY_USER
+from api.models import MatchingForCompany, MatchingForWorker, Matching
 from api.serializers import MatchingForWorkerSerializer, MatchingForCompanySerializer
+from users.models import Company, Worker
 
 
 class MatchingViewSet(mixins.ListModelMixin,
@@ -26,10 +28,48 @@ class MatchingViewSet(mixins.ListModelMixin,
 
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def like(request):
-    return Response({"message": "Got some data!", "data": request.data})
+    try:
+        company_id = request.data['company_id']
+        worker_id = request.data['worker_id']
+        company = Company.objects.get(id=company_id)
+        worker = Worker.objects.get(id=worker_id)
+        try:
+            obj = Matching.objects.get(company=company, worker=worker)
+            if (request.user.is_staff and obj.status == MATCHED_BY_USER) or \
+                    ((not request.user.is_staff) and obj.status == MATCHED_BY_COMPANY):
+                obj.status = MATCHED_BY_BOTH
+                MatchingForWorker.objects.filter(worker=worker, company=company).delete()
+                MatchingForCompany.objects.filter(worker=worker, company=company).delete()
+                obj.save()
+            else:
+                return Response({"message": "In some case decided by user or company"})
+        except Matching.DoesNotExist:
+            Matching.objects.create(company=company, worker=worker, status=
+                                    MATCHED_BY_COMPANY if request.user.is_staff else MATCHED_BY_USER)
+        return Response({"message": "Liked"})
+    except Exception as e:
+        return Response({"error": e})
 
 
 @api_view(['POST'])
+@permission_classes((IsAuthenticated,))
 def dislike(request):
-    pass
+    try:
+        company_id = request.data['company_id']
+        worker_id = request.data['worker_id']
+        company = Company.objects.get(id=company_id)
+        worker = Worker.objects.get(id=worker_id)
+        try:
+            obj = Matching.objects.get(company=company, worker=worker)
+            obj.status = DECLINED_BY_COMPANY if request.user.is_staff else DECLINED_BY_USER
+            obj.save()
+            MatchingForWorker.objects.filter(worker=worker, company=company).delete()
+            MatchingForCompany.objects.filter(worker=worker, company=company).delete()
+        except Matching.DoesNotExist:
+            Matching.objects.create(company=company, worker=worker, status=
+                                    DECLINED_BY_COMPANY if request.user.is_staff else DECLINED_BY_USER)
+        return Response({"message": "SUCCESSFUL DECLINED"})
+    except Exception as e:
+        return Response({"error": e})
