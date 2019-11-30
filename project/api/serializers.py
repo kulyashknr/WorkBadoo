@@ -13,3 +13,15 @@ class VacancySerializer(serializers.ModelSerializer):
     class Meta:
         model = Vacancy
         fields = '__all__'
+
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vacancy
+        fields = '__all__'
+
+
+class WorkerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Vacancy
+        fields = '__all__'
