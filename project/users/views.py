@@ -27,9 +27,9 @@ class RegisterCompany(APIView):
     permission_classes = (IsCompany, )
 
     def post(self, request):
-        serializer = CompanySerializer
+        serializer = CompanySerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=self.request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -39,8 +39,8 @@ class RegisterWorker(APIView):
     permission_classes = (IsAuthenticated, )
 
     def post(self, request):
-        serializer = WorkerSerializer
+        serializer = WorkerSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(user=self.request.user)
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

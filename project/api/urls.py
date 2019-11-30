@@ -3,7 +3,7 @@ from rest_framework_jwt.views import obtain_jwt_token
 from rest_framework import routers
 
 from users.views import Register, RegisterCompany, RegisterWorker
-from .views import matching
+from .views import matching, vacancy
 
 urlpatterns = [
     path('login/', obtain_jwt_token),
@@ -16,5 +16,6 @@ urlpatterns = [
 
 router = routers.DefaultRouter()
 router.register('matching', matching.MatchingViewSet, base_name='api')
+router.register('vacancy', vacancy.VacancyViewSet, base_name='api')
 
 urlpatterns += router.urls

@@ -1,4 +1,5 @@
 from rest_framework import viewsets, mixins, status
+from rest_framework.decorators import api_view, action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
@@ -7,6 +8,8 @@ from api.serializers import VacancySerializer
 
 
 import logging
+
+from users.models import Company
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +33,11 @@ class VacancyViewSet(mixins.CreateModelMixin,
         print(self.request.user)
         return Vacancy.objects.all()
 
-    @action(methods=['POST'], detail=False)
+    @action(methods=['POST'], detail=True)
     def perform_create(self, serializer):
         logger.info(f"{self.request.user} created vacancy {self.request.data.get('name')}")
-        return serializer.save(creator=self.request.user)
+        company = Company.objects.get(user=self.request.user)
+        return serializer.save(creator=company)
 
     @action(methods=['PUT'], detail=True)
     def perform_update(self, serializer):

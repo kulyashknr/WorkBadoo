@@ -9,11 +9,11 @@ class Vacancy(models.Model):
     creator = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, related_name='vacancy_creator')
     description = models.TextField
     salary = models.IntegerField
-    is_active = models.BooleanField()
+    is_active = models.BooleanField(blank=True, default=True)
     industry = models.SmallIntegerField(choices=INDUSTRY_TYPES)
 
     def __str__(self):
-        return f'{ self.name }: { self.salary }, { self.company }'
+        return f'{ self.name }: { self.salary }'
 
 
 class MatchingForWorker(models.Model):
