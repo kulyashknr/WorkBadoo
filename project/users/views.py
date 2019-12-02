@@ -24,7 +24,7 @@ class Register(APIView):
 
 class RegisterCompany(APIView):
     http_method_names = ['post']
-    permission_classes = (IsCompany, )
+    permission_classes = (IsAuthenticated, )
 
     def post(self, request):
         serializer = CompanySerializer(data=request.data)

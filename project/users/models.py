@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
-from api.constants import USER_TYPES
+from api.constants import USER_TYPES, INDUSTRY_TYPES
 
 
 class MainUser(AbstractUser):
@@ -21,7 +21,7 @@ class Worker(models.Model):
     bio = models.TextField(max_length=500)
     education = models.CharField(max_length=255)
     experience = models.CharField(max_length=255)
-
+    industry = models.SmallIntegerField(choices=INDUSTRY_TYPES)
 
 class Company(models.Model):
     name = models.CharField(max_length=255)
