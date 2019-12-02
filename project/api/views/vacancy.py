@@ -46,10 +46,11 @@ class VacancyViewSet(mixins.CreateModelMixin,
                      mixins.ListModelMixin):
     queryset = Vacancy.objects.all()
     serializer_class = VacancySerializer
-    permission_classes = (IsCompany, )
+    #permission_classes = (IsCompany, )
 
     def get_queryset(self):
-        return Vacancy.objects.filter(creator__user=self.request.user)
+        #industry = Vacancy.objects.filter(industry=1)
+        return Vacancy.objects.filter(industry=1)
 
     @action(methods=['POST'], detail=True)
     def perform_create(self, serializer):

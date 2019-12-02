@@ -19,20 +19,54 @@ class VacancySerializer(serializers.ModelSerializer):
         model = Vacancy
         fields = '__all__'
 
+    def validate_salary(self, value):
+        if value < 0:
+            raise serializers.ValidationError('Salary > 0')
+        return value
+
+    def validate_description(self, value):
+        if len(value) < 100:
+            raise serializers.ValidationError('Description should be longer')
+        return value
+
 
 class CompanySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Company
-        fields = '__all__'
+    name = serializers.CharField()
+    user = serializers.RelatedField(read_only=True)
+    description = serializers.CharField(max_length=1000)
+    address = serializers.CharField()
+
+    def validate_address(self, value):
+        if value.isalnum():
+            raise serializers.ValidationError('Address should contain both street name and number')
+        return value
+
+    def validate_description(self, value):
+        if len(value) < 100:
+            raise serializers.ValidationError('Description should be longer')
+        return value
 
 
 class WorkerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Worker
-        fields = '__all__'
+    user = serializers.RelatedField(read_only=True)
+    bio = serializers.CharField(max_length=1000)
+    education = serializers.CharField(max_length=255)
+    experience = serializers.CharField(max_length=255)
+    industry = serializers.IntegerField
+
+    def validate_bio(self, value):
+        if len(value) < 100:
+            raise serializers.ValidationError('Bio should be longer')
+        return value
+
+    def validate_education(self, value):
+        if len(value) < 100:
+            raise serializers.ValidationError('Education description should be longer')
+        return value
 
 
 class MatchingForWorkerSerializer(serializers.ModelSerializer):
+    vacancies = VacancySerializer(write_only=True)
 
     class Meta:
         model = MatchingForWorker
@@ -40,6 +74,7 @@ class MatchingForWorkerSerializer(serializers.ModelSerializer):
 
 
 class MatchingForCompanySerializer(serializers.ModelSerializer):
+    workers = WorkerSerializer(write_only=True)
 
     class Meta:
         model = MatchingForCompany
