@@ -8,6 +8,10 @@ from api.models import MatchingForCompany, MatchingForWorker, Matching
 from api.serializers import MatchingForWorkerSerializer, MatchingForCompanySerializer
 from users.models import Company, Worker
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 class MatchingViewSet(mixins.ListModelMixin,
                       viewsets.GenericViewSet):
@@ -43,6 +47,7 @@ def like(request):
                 MatchingForWorker.objects.filter(worker=worker, company=company).delete()
                 MatchingForCompany.objects.filter(worker=worker, company=company).delete()
                 obj.save()
+                logger.info(f"Liked")
             else:
                 return Response({"message": "In some case decided by user or company"})
         except Matching.DoesNotExist:
@@ -65,6 +70,7 @@ def dislike(request):
             obj = Matching.objects.get(company=company, worker=worker)
             obj.status = DECLINED_BY_COMPANY if request.user.is_staff else DECLINED_BY_USER
             obj.save()
+            logger.info(f"Disliked")
             MatchingForWorker.objects.filter(worker=worker, company=company).delete()
             MatchingForCompany.objects.filter(worker=worker, company=company).delete()
         except Matching.DoesNotExist:

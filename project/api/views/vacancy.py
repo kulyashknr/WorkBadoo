@@ -1,15 +1,15 @@
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import api_view, action
+from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
-from api.models import Vacancy, MatchingForWorker, MatchingForCompany
-from api.serializers import VacancySerializer
-
-
-import logging
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from users.models import Company, Worker
+from api.models import Vacancy, MatchingForWorker, MatchingForCompany, MainUser
+from api.serializers import VacancySerializer, UserSerializer
+
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +17,15 @@ logger = logging.getLogger(__name__)
 class IsCompany(IsAuthenticated):
     def has_permission(self, request, view):
         return request.user and request.user.is_staff
+
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = UserSerializer
+    permission_classes = (IsAuthenticated, )
+
+    def get_queryset(self):
+        print(self.request.user)
+        return MainUser.objects.all()
 
 
 def create_connection(company, industry):
@@ -33,24 +42,31 @@ def create_connection(company, industry):
     match = MatchingForCompany.objects.filter(company=company)
     if len(match) == 0:
         MatchingForCompany.objects.create(company=company, workers=workers)
+        logger.info(f"CONNECTION CREATED!")
     else:
         match.add(workers)
         match.save()
+
+
+class VacancyListView(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    authentication_classes = (JSONWebTokenAuthentication,)
+    serializer_class = VacancySerializer
+    lookup_field = 'industry'
+
+    def get_queryset(self):
+        return Vacancy.objects.filter(industry=self.kwargs[self.lookup_field])
 
 
 class VacancyViewSet(mixins.CreateModelMixin,
                      mixins.RetrieveModelMixin,
                      mixins.UpdateModelMixin,
                      mixins.DestroyModelMixin,
-                     viewsets.GenericViewSet,
-                     mixins.ListModelMixin):
+                     viewsets.GenericViewSet):
     queryset = Vacancy.objects.all()
     serializer_class = VacancySerializer
-    #permission_classes = (IsCompany, )
+    permission_classes = (IsCompany, )
 
-    def get_queryset(self):
-        #industry = Vacancy.objects.filter(industry=1)
-        return Vacancy.objects.filter(industry=1)
 
     @action(methods=['POST'], detail=True)
     def perform_create(self, serializer):

@@ -30,7 +30,7 @@ class VacancySerializer(serializers.ModelSerializer):
         return value
 
 
-class CompanySerializer(serializers.ModelSerializer):
+class CompanySerializer(serializers.Serializer):
     name = serializers.CharField()
     user = serializers.RelatedField(read_only=True)
     description = serializers.CharField(max_length=1000)
@@ -47,7 +47,7 @@ class CompanySerializer(serializers.ModelSerializer):
         return value
 
 
-class WorkerSerializer(serializers.ModelSerializer):
+class WorkerSerializer(serializers.Serializer):
     user = serializers.RelatedField(read_only=True)
     bio = serializers.CharField(max_length=1000)
     education = serializers.CharField(max_length=255)
