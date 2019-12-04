@@ -1,6 +1,26 @@
 from django.db import models
 from users.models import MainUser, Worker, Company
-from .constants import INDUSTRY_TYPES, MATCHING_STATUSES
+from .constants import *
+
+
+class ItVacancyManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(industry=IT_INDUSTRY)
+
+
+class BusinessVacancyManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(industry=BUSINESS_INDUSTRY)
+
+
+class ServiceVacancyManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(industry=SERVICE_INDUSTRY)
+
+
+class EducationVacancyManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(industry=EDUCATION_INDUSTRY)
 
 
 class Vacancy(models.Model):
@@ -11,6 +31,11 @@ class Vacancy(models.Model):
     salary = models.IntegerField
     is_active = models.BooleanField(blank=True, default=True)
     industry = models.SmallIntegerField(choices=INDUSTRY_TYPES)
+
+    itVacancies = ItVacancyManager()
+    businessVacancies = BusinessVacancyManager()
+    serviceVacancies = ServiceVacancyManager()
+    educationVacancies = EducationVacancyManager()
 
     def __str__(self):
         return f'{ self.name }: { self.salary }'
