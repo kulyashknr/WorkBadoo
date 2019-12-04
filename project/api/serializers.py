@@ -2,16 +2,21 @@ from rest_framework import serializers
 from .models import MainUser, Vacancy, MatchingForWorker, MatchingForCompany, Company, Worker
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserShortSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = MainUser
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'password')
+        fields = ('id', 'username')
 
     def create(self, validated_data):
         user = MainUser.objects.create_user(**validated_data)
         return user
+
+
+class UserFullSerializer(UserShortSerializer):
+    class Meta:
+        fields = UserShortSerializer.Meta.fields + ('email', 'first_name', 'last_name', 'password')
 
 
 class VacancySerializer(serializers.ModelSerializer):
