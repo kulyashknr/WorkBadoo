@@ -17,13 +17,14 @@ class MainUser(AbstractUser):
 
 class WorkerCompanyBase(models.Model):
     photo = models.FileField(upload_to=user_photo_path, validators=[validate_size, validate_extension], blank=True, null=True)
-    user = models.ForeignKey(MainUser, on_delete=models.CASCADE, null=True, related_name='user')
+
 
     class Meta:
         abstract = True
 
 
 class Worker(WorkerCompanyBase):
+    user = models.ForeignKey(MainUser, on_delete=models.CASCADE, null=True, related_name='worker_user')
     bio = models.TextField(max_length=500)
     education = models.CharField(max_length=255)
     experience = models.CharField(max_length=255)
@@ -31,6 +32,7 @@ class Worker(WorkerCompanyBase):
 
 
 class Company(WorkerCompanyBase):
+    user = models.ForeignKey(MainUser, on_delete=models.CASCADE, null=True, related_name='company_user')
     name = models.CharField(max_length=255)
     description = models.TextField
     address = models.CharField(max_length=255)

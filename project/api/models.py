@@ -42,7 +42,7 @@ class Vacancy(models.Model):
 
 
 class MatchingForWorker(models.Model):
-    worker = models.ForeignKey(MainUser, on_delete=models.DO_NOTHING, null=True, related_name='matchforworker_worker')
+    worker = models.ForeignKey(Worker, on_delete=models.DO_NOTHING, null=True, related_name='matchforworker_worker')
     vacancies = models.ManyToManyField(Vacancy)
 
 

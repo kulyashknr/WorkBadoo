@@ -16,7 +16,8 @@ class UserShortSerializer(serializers.ModelSerializer):
 
 class UserFullSerializer(UserShortSerializer):
     class Meta:
-        fields = UserShortSerializer.Meta.fields + ('email', 'first_name', 'last_name', 'password')
+        model = MainUser
+        fields = '__all__'
 
 
 class VacancySerializer(serializers.ModelSerializer):
@@ -35,11 +36,15 @@ class VacancySerializer(serializers.ModelSerializer):
         return value
 
 
-class CompanySerializer(serializers.Serializer):
-    name = serializers.CharField()
-    user = serializers.RelatedField(read_only=True)
-    description = serializers.CharField(max_length=1000)
-    address = serializers.CharField()
+class CompanySerializer(serializers.ModelSerializer):
+    # name = serializers.CharField()
+    # user = UserShortSerializer(read_only=True)
+    # description = serializers.CharField(max_length=1000)
+    # address = serializers.CharField()
+
+    class Meta:
+        model = Company
+        fields = '__all__'
 
     def validate_address(self, value):
         if value.isalnum():

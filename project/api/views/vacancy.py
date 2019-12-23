@@ -6,8 +6,8 @@ from rest_framework.response import Response
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from users.models import Company, Worker
-from api.models import Vacancy, MatchingForWorker, MatchingForCompany, MainUser
-from api.serializers import VacancySerializer, UserSerializer
+from api.models import MatchingForWorker, MatchingForCompany, MainUser, Vacancy
+from api.serializers import VacancySerializer, UserFullSerializer, UserShortSerializer
 
 import logging
 
@@ -20,7 +20,7 @@ class IsCompany(IsAuthenticated):
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    serializer_class = UserSerializer
+    serializer_class = UserFullSerializer
     permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
@@ -28,12 +28,15 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
         return MainUser.objects.all()
 
 
-def create_connection(company, industry):
+def create_connection(vacancy, company, industry):
     workers = Worker.objects.filter(industry=industry)
+    print(workers)
     match = MatchingForWorker.objects.filter(worker__in=workers)
+    print(match)
+    print("here..")
     if len(match) == 0:
         for worker in workers:
-            MatchingForWorker.objects.create(worker=worker, company=company)
+            MatchingForWorker.objects.create(worker=worker, vacancy)
     else:
         for obj in match:
             obj.add(company)
@@ -63,7 +66,7 @@ class VacancyViewSet(mixins.CreateModelMixin,
                      mixins.UpdateModelMixin,
                      mixins.DestroyModelMixin,
                      viewsets.GenericViewSet):
-    queryset = Vacancy.objects.all()
+    # queryset = Vacancy.objects.all()
     serializer_class = VacancySerializer
     permission_classes = (IsCompany, )
 
@@ -73,8 +76,12 @@ class VacancyViewSet(mixins.CreateModelMixin,
         try:
             logger.info(f"{self.request.user} created vacancy {self.request.data.get('name')}")
             company = Company.objects.get(user=self.request.user)
-            create_connection(company, serializer.data['industry'])
-            return serializer.save(creator=company)
+            print('all ok')
+            vacancy = serializer.save(creator=company)
+            create_connection(vacancy, company, serializer.data['industry'])
+            print('all is ok 2')
+            print(company)
+            return vacancy
         except Exception as e:
             logger.error(e)
             return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
