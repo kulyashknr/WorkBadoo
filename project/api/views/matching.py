@@ -20,11 +20,12 @@ class MatchingViewSet(mixins.ListModelMixin,
 
     def get_serializer_class(self):
         if self.request.user.is_staff:
-            return MatchingForWorkerSerializer
-        return MatchingForCompanySerializer
+            return MatchingForCompanySerializer
+        return MatchingForWorkerSerializer
 
     def get_queryset(self):
         user = self.request.user
+        print(MatchingForWorker.objects.all())
         if user.is_staff:
             return MatchingForCompany.objects.filter(vacancy=user)
         else:

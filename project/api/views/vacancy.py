@@ -34,11 +34,14 @@ def create_connection(vacancy, company, industry):
     match = MatchingForWorker.objects.filter(worker__in=workers)
     if len(match) == 0:
         for worker in workers:
-            MatchingForWorker.objects.create(worker=worker, vacancy=vacancy)
+            vv = MatchingForWorker.objects.create(worker=worker)
+            vv.vacancies.add(vacancy)
+        print(MatchingForWorker.objects.all())
     else:
+        print("not here")
         for obj in match:
-            obj.add(company)
-            obj.save()
+            obj.vacancies.add(vacancy)
+        print("all right")
     match = MatchingForCompany.objects.filter(vacancy__creator=company)
     if len(match) == 0:
         mtching = MatchingForCompany.objects.create(vacancy=vacancy)

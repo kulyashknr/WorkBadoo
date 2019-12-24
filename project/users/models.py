@@ -30,6 +30,9 @@ class Worker(WorkerCompanyBase):
     experience = models.CharField(max_length=255)
     industry = models.SmallIntegerField(choices=INDUSTRY_TYPES)
 
+    def __str__(self):
+        return f'{ self.user }'
+
 
 class Company(WorkerCompanyBase):
     user = models.ForeignKey(MainUser, on_delete=models.CASCADE, null=True, related_name='company_user')

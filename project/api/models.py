@@ -45,6 +45,9 @@ class MatchingForWorker(models.Model):
     worker = models.ForeignKey(Worker, on_delete=models.DO_NOTHING, null=True, related_name='matchforworker_worker')
     vacancies = models.ManyToManyField(Vacancy)
 
+    def __str__(self):
+        return f'{self.worker}'
+
 
 class MatchingForCompany(models.Model):
     workers = models.ManyToManyField(Worker)

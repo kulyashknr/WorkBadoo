@@ -29,10 +29,7 @@ class RegisterCompany(APIView):
     def post(self, request):
         serializer = CompanySerializer(data=request.data)
         if serializer.is_valid():
-            print("hello")
-            print(self.request.user)
             serializer.save(user=self.request.user)
-            print("hello")
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
