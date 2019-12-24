@@ -27,7 +27,8 @@ class MatchingViewSet(mixins.ListModelMixin,
         user = self.request.user
         print(MatchingForWorker.objects.all())
         if user.is_staff:
-            return MatchingForCompany.objects.filter(vacancy=user)
+            company = Company.objects.get(user=user)
+            return MatchingForCompany.objects.filter(vacancy__creator=company)
         else:
             return MatchingForWorker.objects.filter(worker__user=user)
 
