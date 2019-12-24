@@ -30,25 +30,27 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
 
 def create_connection(vacancy, company, industry):
     workers = Worker.objects.filter(industry=industry)
-    print(workers)
     match = MatchingForWorker.objects.filter(worker__in=workers)
-    print(match)
-    print("here..")
     if len(match) == 0:
         for worker in workers:
-            MatchingForWorker.objects.create(worker=worker, vacancy)
+            MatchingForWorker.objects.create(worker=worker, vacancy=vacancy)
     else:
         for obj in match:
             obj.add(company)
             obj.save()
-
-    match = MatchingForCompany.objects.filter(company=company)
+    match = MatchingForCompany.objects.filter(vacancy__creator=company)
     if len(match) == 0:
-        MatchingForCompany.objects.create(company=company, workers=workers)
+        mtching = MatchingForCompany.objects.create(vacancy=vacancy)
+        for worker in workers:
+            mtching.workers.add(worker)
         logger.info(f"CONNECTION CREATED!")
     else:
-        match.add(workers)
-        match.save()
+        for obj in match:
+            for worker in workers:
+                obj.workers.add(worker)
+                obj.save()
+            # obj.workers.add(workers)
+            # obj.save()
 
 
 class VacancyListView(ListAPIView):
@@ -69,7 +71,6 @@ class VacancyViewSet(mixins.CreateModelMixin,
     # queryset = Vacancy.objects.all()
     serializer_class = VacancySerializer
     permission_classes = (IsCompany, )
-
 
     @action(methods=['POST'], detail=True)
     def perform_create(self, serializer):

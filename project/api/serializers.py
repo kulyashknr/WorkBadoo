@@ -57,20 +57,18 @@ class CompanySerializer(serializers.ModelSerializer):
         return value
 
 
-class WorkerSerializer(serializers.Serializer):
-    user = serializers.RelatedField(read_only=True)
-    bio = serializers.CharField(max_length=1000)
-    education = serializers.CharField(max_length=255)
-    experience = serializers.CharField(max_length=255)
-    industry = serializers.IntegerField
+class WorkerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Worker
+        fields = '__all__'
 
     def validate_bio(self, value):
-        if len(value) < 100:
+        if len(value) < 1:
             raise serializers.ValidationError('Bio should be longer')
         return value
 
     def validate_education(self, value):
-        if len(value) < 100:
+        if len(value) < 1:
             raise serializers.ValidationError('Education description should be longer')
         return value
 
