@@ -28,7 +28,7 @@ class MatchingViewSet(mixins.ListModelMixin,
         if user.is_staff:
             return MatchingForCompany.objects.filter(vacancy=user)
         else:
-            return MatchingForWorker.objects.filter(worker=user)
+            return MatchingForWorker.objects.filter(worker__user=user)
 
 
 @api_view(['POST'])
