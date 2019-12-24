@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from users.models import Company, Worker
-from api.models import MatchingForWorker, MatchingForCompany, MainUser, Vacancy
+from api.models import MatchingForWorker, MatchingForCompany, MainUser
+from api.models import Vacancy as Vac
 from api.serializers import VacancySerializer, UserFullSerializer, UserShortSerializer
 
 import logging
@@ -55,12 +56,13 @@ def create_connection(vacancy, company, industry):
 
 class VacancyListView(ListAPIView):
     permission_classes = (IsAuthenticated, )
-    authentication_classes = (JSONWebTokenAuthentication,)
+    # authentication_classes = (JSONWebTokenAuthentication,)
     serializer_class = VacancySerializer
+    queryset = Vac.objects.all()
     lookup_field = 'industry'
 
     def get_queryset(self):
-        return Vacancy.objects.filter(industry=self.kwargs[self.lookup_field])
+        return Vac.objects.all()
 
 
 class VacancyViewSet(mixins.CreateModelMixin,
@@ -77,11 +79,8 @@ class VacancyViewSet(mixins.CreateModelMixin,
         try:
             logger.info(f"{self.request.user} created vacancy {self.request.data.get('name')}")
             company = Company.objects.get(user=self.request.user)
-            print('all ok')
             vacancy = serializer.save(creator=company)
             create_connection(vacancy, company, serializer.data['industry'])
-            print('all is ok 2')
-            print(company)
             return vacancy
         except Exception as e:
             logger.error(e)

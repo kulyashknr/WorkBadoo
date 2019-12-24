@@ -32,10 +32,10 @@ class Vacancy(models.Model):
     is_active = models.BooleanField(blank=True, default=True)
     industry = models.SmallIntegerField(choices=INDUSTRY_TYPES)
 
-    itVacancies = ItVacancyManager()
-    businessVacancies = BusinessVacancyManager()
-    serviceVacancies = ServiceVacancyManager()
-    educationVacancies = EducationVacancyManager()
+    # itVacancies = ItVacancyManager()
+    # businessVacancies = BusinessVacancyManager()
+    # serviceVacancies = ServiceVacancyManager()
+    # educationVacancies = EducationVacancyManager()
 
     def __str__(self):
         return f'{ self.name }: { self.salary }'
